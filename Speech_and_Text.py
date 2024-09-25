@@ -108,4 +108,6 @@ def speech_to_text_ifly(audio_path: str = "test.wav", if_microphone: bool = True
     # string转dict并提取关键字
     return json.loads(result)['data']
 
-print(speech_to_text_baidu(if_microphone=True))
+
+if __name__ == "__main__":
+    print(speech_to_text_baidu(if_microphone=True))

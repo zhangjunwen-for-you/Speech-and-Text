@@ -4,7 +4,6 @@ import time
 import hashlib
 import base64
 import json
-import pyttsx3
 from aip import AipSpeech
 from pydub import AudioSegment
 import os.path as path
@@ -22,7 +21,7 @@ def _record(if_cmu: bool = False):
     file_name = path.join(path.dirname(path.abspath(__file__)), "audio/speech.wav")
     with open(file_name, "wb") as f:
         f.write(audio.get_wav_data())
-    
+
     if if_cmu:
         return audio
     else:
@@ -36,9 +35,9 @@ def _get_file_content(file_name):
 
 def speech_to_text_baidu(audio_path: str = "test.wav", if_microphone: bool = True):
     # https://cloud.baidu.com/product/speech 申请api
-    app_id = ""
-    api_key = ""
-    secret_key = ""
+    app_id = "115695929"
+    api_key = "CnpLkZWVxjvgZyK76S1pJUHu"
+    secret_key = "nI1Pnsb14NQcd1KsXeuSVGhkqZONvCk8"
     client = AipSpeech(app_id, api_key, secret_key)
 
     # 麦克风读入
@@ -56,27 +55,6 @@ def speech_to_text_baidu(audio_path: str = "test.wav", if_microphone: bool = Tru
         return "..."
     else:
         return result['result'][0]
-
-def speech_to_text_cmu(audio_path: str = "test.wav", if_microphone: bool = True):
-    # 语种
-    language_type = "zh-CN"
-
-    # 麦克风读入
-    if if_microphone:
-        audio = _record(if_cmu = True)
-    # 文件读入
-    else:
-        with sr.AudioFile(audio_path) as source:
-            audio = r.record(source)
-
-    try:
-        # print(r.recognize_sphinx(audio, language=language_type))
-        return r.recognize_sphinx(audio, language=language_type)
-    except sr.UnknownValueError:
-        print("Could not understand")
-    except sr.RequestError as e:
-        print("Sphinx error; {0}".format(e))
-
 
 def speech_to_text_ifly(audio_path: str = "test.wav", if_microphone: bool = True):
     url = "http://api.xfyun.cn/v1/service/v1/iat"
@@ -108,7 +86,7 @@ def speech_to_text_ifly(audio_path: str = "test.wav", if_microphone: bool = True
         return header
 
     def get_body(filepath):
-        
+
         if if_microphone:
             data = {'audio': base64.b64encode(filepath)}  # Base64编码
         else:
@@ -125,13 +103,9 @@ def speech_to_text_ifly(audio_path: str = "test.wav", if_microphone: bool = True
     # 文件读入
     else:
         res = requests.post(url, headers=get_header(aue, engine_type), data=get_body(audio_path))
-    
+
     result = res.content.decode('utf-8')
     # string转dict并提取关键字
     return json.loads(result)['data']
 
-
-def text_to_speech(sentence: str):
-    engine = pyttsx3.init()
-    engine.say(sentence)
-    engine.runAndWait()
+print(speech_to_text_baidu(if_microphone=True))
